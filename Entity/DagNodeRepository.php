@@ -9,6 +9,6 @@ use Doctrine\ORM\EntityRepository;
  *
  * None yet.
  */
-class DagNodeRepository extends EntityRepository
+abstract class DagNodeRepository extends EntityRepository
 {
 }

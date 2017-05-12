@@ -7,70 +7,51 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * This entity represents a connection between nodes in the graph.
  *
- * @ORM\Table(name="dag_edge")
- * @ORM\Entity(repositoryClass="MLB\DagBundle\Entity\DagEdgeRepository")
+ * @ORM\MappedSuperclass()
  */
-class DagEdge
+abstract class DagEdge
 {
+    protected $id;
+
     /**
-     * @var id The ID of the edge.
+     * @var integer The number of hops (i.e. direct edges) this edge skips.
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
-    
-    /**
-     * @var incoming_edge The incoming edge responsible for the creation of this edge.
-     * 
-     * @ORM\ManyToOne(targetEntity="DagEdge")
-     * @ORM\JoinColumn(name="incoming_edge_id", referencedColumnName="id", onDelete="CASCADE")
-     **/
-    private $incoming_edge;
-
-    /**
-     * @var direct_edge The direct edge responsible for the creation of this edge.
-     * 
-     * @ORM\ManyToOne(targetEntity="DagEdge")
-     * @ORM\JoinColumn(name="direct_edge_id", referencedColumnName="id", onDelete="CASCADE")
-     **/
-    private $direct_edge;
-
-    /**
-     * @var outgoing_edge The outgoing edge responsible for the creation of this edge.
-     * 
-     * @ORM\ManyToOne(targetEntity="DagEdge")
-     * @ORM\JoinColumn(name="outgoing_edge_id", referencedColumnName="id", onDelete="CASCADE")
-     **/
-    private $outgoing_edge;
-
-    /**
-     * @var start_node The node this edge starts from.
-     * 
-     * @ORM\ManyToOne(targetEntity="DagNode")
-     * @ORM\JoinColumn(name="start_node_id", referencedColumnName="id", onDelete="RESTRICT")
-     **/
-    private $start_node;
-
-    /**
-     * @var end_node The node this edge end to.
-     * 
-     * @ORM\ManyToOne(targetEntity="DagNode")
-     * @ORM\JoinColumn(name="end_node_id", referencedColumnName="id", onDelete="CASCADE")
-     **/
-    private $end_node;
-    
-    /**
-     * The number of hops (i.e. direct edges) this edge skips.
      * @ORM\Column(type="integer")
      */
-    private $hops;
-    
+    protected $hops;
+
+    // Relationship mappings to be defined in concrete class
+
+    /**
+     * @var DagEdge The incoming edge responsible for the creation of this edge.
+     */
+    protected $incomingEdge;
+
+    /**
+     * @var DagEdge The direct edge responsible for the creation of this edge.
+     */
+    protected $directEdge;
+
+    /**
+     * @var DagEdge The outgoing edge responsible for the creation of this edge.
+     */
+    protected $outgoingEdge;
+
+    /**
+     * @var DagNode The node this edge starts from.
+     */
+    protected $startNode;
+
+    /**
+     * @var DagNode The node this edge end to.
+     */
+    protected $endNode;
+
+
     /**
      * Gets the ID of the edge
      *
-     * @return id 
+     * @return integer
      */
     public function getId()
     {
@@ -108,7 +89,7 @@ class DagEdge
      */
     public function setIncomingEdge(DagEdge $incomingEdge = null)
     {
-        $this->incoming_edge = $incomingEdge;
+        $this->incomingEdge = $incomingEdge;
 
         return $this;
     }
@@ -120,7 +101,7 @@ class DagEdge
      */
     public function getIncomingEdge()
     {
-        return $this->incoming_edge;
+        return $this->incomingEdge;
     }
 
     /**
@@ -131,7 +112,7 @@ class DagEdge
      */
     public function setDirectEdge(DagEdge $directEdge = null)
     {
-        $this->direct_edge = $directEdge;
+        $this->directEdge = $directEdge;
 
         return $this;
     }
@@ -143,7 +124,7 @@ class DagEdge
      */
     public function getDirectEdge()
     {
-        return $this->direct_edge;
+        return $this->directEdge;
     }
 
     /**
@@ -154,7 +135,7 @@ class DagEdge
      */
     public function setOutgoingEdge(DagEdge $outgoingEdge = null)
     {
-        $this->outgoing_edge = $outgoingEdge;
+        $this->outgoingEdge = $outgoingEdge;
 
         return $this;
     }
@@ -166,7 +147,7 @@ class DagEdge
      */
     public function getOutgoingEdge()
     {
-        return $this->outgoing_edge;
+        return $this->outgoingEdge;
     }
 
     /**
@@ -177,7 +158,7 @@ class DagEdge
      */
     public function setStartNode(DagNode $startNode = null)
     {
-        $this->start_node = $startNode;
+        $this->startNode = $startNode;
 
         return $this;
     }
@@ -189,7 +170,7 @@ class DagEdge
      */
     public function getStartNode()
     {
-        return $this->start_node;
+        return $this->startNode;
     }
 
     /**
@@ -200,7 +181,7 @@ class DagEdge
      */
     public function setEndNode(DagNode $endNode = null)
     {
-        $this->end_node = $endNode;
+        $this->endNode = $endNode;
 
         return $this;
     }
@@ -212,6 +193,6 @@ class DagEdge
      */
     public function getEndNode()
     {
-        return $this->end_node;
+        return $this->endNode;
     }
 }

@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mlb\DagBundle\Entity\DagEdge;
 use Mlb\DagBundle\Entity\DagNode;
+use Mlb\DagBundle\Tests\Doctrine\Entity\NamedDagNode;
 
 class LoadDagNodes implements FixtureInterface
 {
@@ -13,7 +14,7 @@ class LoadDagNodes implements FixtureInterface
     {
         for($i = 0; $i<10; $i++)
         {
-            $temp = new DagNode('Node '.$i);
+            $temp = new NamedDagNode('Node '.$i);
             $manager->persist($temp);
         }
         $manager->flush();

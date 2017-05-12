@@ -4,12 +4,17 @@ doctrine:
     driver: pdo_mysql
     host: 127.0.0.1
     port: ~
-    dbname: test
-    user: root
-    password: ~
+    dbname: mlbdagbundle
+    user: mlbdagbundle
+    password: mlbdagbundle
   orm:
     auto_generate_proxy_classes: "%kernel.debug%"
     auto_mapping: true
+    mappings:
+      MlbDagBundleTestsDoctrineEntity:
+        type: annotation
+        dir: 'Tests/Doctrine/Entity'
+        prefix: Mlb\DagBundle\Tests\Doctrine\Entity
 
 framework:
   router:
