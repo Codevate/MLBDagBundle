@@ -30,16 +30,6 @@ class NamedDagNode extends DagNode
   private $name;
 
   /**
-   * Get the ID of the node.
-   *
-   * @return integer
-   */
-  public function getId()
-  {
-    return $this->id;
-  }
-
-  /**
    * Sets the name of the node.
    *
    * @param string $name The name of the node.

@@ -51,7 +51,7 @@ abstract class DagEdge
     /**
      * Gets the ID of the edge
      *
-     * @return integer
+     * @return mixed
      */
     public function getId()
     {

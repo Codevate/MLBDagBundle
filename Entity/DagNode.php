@@ -16,7 +16,7 @@ abstract class DagNode
     /**
      * Get the ID of the node.
      *
-     * @return integer
+     * @return mixed
      */
     public function getId()
     {

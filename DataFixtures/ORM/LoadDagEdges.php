@@ -5,13 +5,9 @@ namespace Mlb\DagBundle\DataFixtures\ORM;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use MLB\DagBundle\Entity\DagEdge;
-use MLB\DagBundle\Entity\DagNode;
 
 class LoadDagEdges implements FixtureInterface, DependentFixtureInterface
 {
-    private $node = array(10);
-
     public function getDependencies()
     {
         return array('Mlb\DagBundle\DataFixtures\ORM\LoadDagNodes');
@@ -20,14 +16,13 @@ class LoadDagEdges implements FixtureInterface, DependentFixtureInterface
     public function load(ObjectManager $manager)
     {
         $repoNode = $manager->getRepository('Mlb\DagBundle\Tests\Doctrine\Entity\NamedDagNode');
-        
+        $repoEdge = $manager->getRepository('Mlb\DagBundle\Tests\Doctrine\Entity\NamedDagEdge');
+
         $nodes = $repoNode->findAll();
         foreach ($nodes as $node) {
             $nodeArray[] = $node;
         }
 
-        $repoEdge = $manager->getRepository('Mlb\DagBundle\Tests\Doctrine\Entity\NamedDagEdge');
-        
         // First graph
         $repoEdge->createEdge($nodeArray[0], $nodeArray[1]);
         $repoEdge->createEdge($nodeArray[0], $nodeArray[2]);
@@ -45,11 +40,5 @@ class LoadDagEdges implements FixtureInterface, DependentFixtureInterface
         $repoEdge->createEdge($nodeArray[6], $nodeArray[7]);
         $repoEdge->createEdge($nodeArray[7], $nodeArray[8]);
         $repoEdge->createEdge($nodeArray[8], $nodeArray[9]);
-
-        // Connect the two graphs
-        //$repoEdge->createEdge($nodeArray[4], $nodeArray[5]);
-        
-        // Disconnect the two graphs
-        //$repoEdge->deleteEdgeByEnds($nodeArray[4], $nodeArray[5]);
     }
 }

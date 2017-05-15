@@ -2,13 +2,7 @@
 
 namespace Mlb\DagBundle\Tests\Doctrine;
 
-use Mlb\DagBundle\DataFixtures\ORM\LoadDagNodes;
-use Mlb\DagBundle\DataFixtures\ORM\LoadDagEdges;
 use Mlb\DagBundle\Tests\IntegrationTestCase;
-use Mlb\DagBundle\Entity\DagEdge;
-use Mlb\DagBundle\Entity\DagNode;
-use Mlb\DagBundle\Entity\DagEdgeRepository;
-use Mlb\DagBundle\Entity\DagNodeRepository;
 use Mlb\DagBundle\Entity\CircularRelationException;
 use Mlb\DagBundle\Entity\EdgeDoesNotExistException;
 
@@ -19,10 +13,11 @@ class DagConnectFunctionalTest extends IntegrationTestCase
      */
     protected $em;
 
-    protected function setUp() {
-		parent::setUp();
+    protected function setUp()
+    {
+		    parent::setUp();
 
-	    $this->em = static::getEntityManager();
+	      $this->em = static::getEntityManager();
     }
 
     public function testDbInit()
@@ -207,7 +202,6 @@ class DagConnectFunctionalTest extends IntegrationTestCase
      */
     public function testConnection()
     {
-
         $this->em = static::getEntityManager();
 
         $nodeRepo = $this->em->getRepository('Mlb\DagBundle\Tests\Doctrine\Entity\NamedDagNode');
@@ -217,7 +211,8 @@ class DagConnectFunctionalTest extends IntegrationTestCase
         
         $edgeRepo = $this->em->getRepository('Mlb\DagBundle\Tests\Doctrine\Entity\NamedDagEdge');
         $edgeRepo->createEdge($node4, $node5);
-	// Double creation to complete test coverage
+
+        // Double creation to complete test coverage
         $edgeRepo->createEdge($node4, $node5);
         $direct = $edgeRepo->findAllDirectEdges();
 
