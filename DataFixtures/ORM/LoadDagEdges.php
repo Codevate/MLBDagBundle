@@ -13,32 +13,40 @@ class LoadDagEdges implements FixtureInterface, DependentFixtureInterface
         return array('Mlb\DagBundle\DataFixtures\ORM\LoadDagNodes');
     }
 
+    /**
+     * Creates a graph with the following structure:
+     *
+     *         (0)                    (1)
+     *          |                      |
+     *         (2)                    (3)
+     *         / \                    / \
+     *       (4) (5)<————————————————/  (6)
+     *        |   |\                     |
+     *       (7)  | \——————————————————>(9)
+     *           (8)
+     *
+     * @param ObjectManager $manager
+     * @throws \Mlb\DagBundle\Entity\CircularRelationException
+     */
     public function load(ObjectManager $manager)
     {
         $repoNode = $manager->getRepository('Mlb\DagBundle\Tests\Doctrine\Entity\NamedDagNode');
         $repoEdge = $manager->getRepository('Mlb\DagBundle\Tests\Doctrine\Entity\NamedDagEdge');
 
         $nodes = $repoNode->findAll();
-        foreach ($nodes as $node) {
-            $nodeArray[] = $node;
-        }
 
         // First graph
-        $repoEdge->createEdge($nodeArray[0], $nodeArray[1]);
-        $repoEdge->createEdge($nodeArray[0], $nodeArray[2]);
-        $repoEdge->createEdge($nodeArray[0], $nodeArray[3]);
-
-        $repoEdge->createEdge($nodeArray[1], $nodeArray[2]);
-        $repoEdge->createEdge($nodeArray[2], $nodeArray[3]);
-        $repoEdge->createEdge($nodeArray[3], $nodeArray[4]);
+        $repoEdge->createEdge($nodes[0], $nodes[2]);
+        $repoEdge->createEdge($nodes[2], $nodes[4]);
+        $repoEdge->createEdge($nodes[2], $nodes[5]);
+        $repoEdge->createEdge($nodes[4], $nodes[7]);
+        $repoEdge->createEdge($nodes[5], $nodes[8]);
+        $repoEdge->createEdge($nodes[5], $nodes[9]);
 
         // Second graph
-        $repoEdge->createEdge($nodeArray[5], $nodeArray[6]);
-        $repoEdge->createEdge($nodeArray[5], $nodeArray[7]);
-        $repoEdge->createEdge($nodeArray[5], $nodeArray[8]);
-
-        $repoEdge->createEdge($nodeArray[6], $nodeArray[7]);
-        $repoEdge->createEdge($nodeArray[7], $nodeArray[8]);
-        $repoEdge->createEdge($nodeArray[8], $nodeArray[9]);
+        $repoEdge->createEdge($nodes[1], $nodes[3]);
+        $repoEdge->createEdge($nodes[3], $nodes[5]);
+        $repoEdge->createEdge($nodes[3], $nodes[6]);
+        $repoEdge->createEdge($nodes[6], $nodes[9]);
     }
 }

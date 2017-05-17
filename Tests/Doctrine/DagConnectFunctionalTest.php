@@ -30,7 +30,7 @@ class DagConnectFunctionalTest extends IntegrationTestCase
         // Count only direct edges
         $edgeRepo = $this->em->getRepository('Mlb\DagBundle\Tests\Doctrine\Entity\NamedDagEdge');
         $direct = $edgeRepo->findAllDirectEdges();
-        $this->assertCount(12, $direct);
+        $this->assertCount(10, $direct);
     }
 
     /*
@@ -40,159 +40,68 @@ class DagConnectFunctionalTest extends IntegrationTestCase
     {
         // Test for test nodes to exist
         $nodeRepo = $this->em->getRepository('Mlb\DagBundle\Tests\Doctrine\Entity\NamedDagNode');
-        $node0 = $nodeRepo->findOneByName('Node 0');
-        $this->assertNotNull($node0);
-        $this->assertEquals($node0->getName(), 'Node 0');
-        $node1 = $nodeRepo->findOneByName('Node 1');
-        $this->assertNotNull($node1);
-        $this->assertEquals($node1->getName(), 'Node 1');
-        $node2 = $nodeRepo->findOneByName('Node 2');
-        $this->assertNotNull($node2);
-        $this->assertEquals($node2->getName(), 'Node 2');
-        $node3 = $nodeRepo->findOneByName('Node 3');
-        $this->assertNotNull($node3);
-        $this->assertEquals($node3->getName(), 'Node 3');
-        $node4 = $nodeRepo->findOneByName('Node 4');
-        $this->assertNotNull($node4);
-        $this->assertEquals($node4->getName(), 'Node 4');
-        $node5 = $nodeRepo->findOneByName('Node 5');
-        $this->assertNotNull($node5);
-        $this->assertEquals($node5->getName(), 'Node 5');
-        $node6 = $nodeRepo->findOneByName('Node 6');
-        $this->assertNotNull($node6);
-        $this->assertEquals($node6->getName(), 'Node 6');
-        $node7 = $nodeRepo->findOneByName('Node 7');
-        $this->assertNotNull($node7);
-        $this->assertEquals($node7->getName(), 'Node 7');
-        $node8 = $nodeRepo->findOneByName('Node 8');
-        $this->assertNotNull($node8);
-        $this->assertEquals($node8->getName(), 'Node 8');
-        $node9 = $nodeRepo->findOneByName('Node 9');
-        $this->assertNotNull($node9);
-        $this->assertEquals($node9->getName(), 'Node 9');
-        
-        $edgeRepo = $this->em->getRepository('Mlb\DagBundle\Tests\Doctrine\Entity\NamedDagEdge');
+        $nodes = [];
+
+        for ($i = 0; $i < 10; $i++) {
+            $name = 'Node ' . $i;
+            $nodes[$i] = $nodeRepo->findOneByName($name);
+
+            $this->assertNotNull($nodes[$i]);
+            $this->assertEquals($nodes[$i]->getName(), $name);
+        }
 
         // Count all the edges
-        $query = $edgeRepo->createQueryBuilder('e')->getQuery();
+        $edgeRepo = $this->em->getRepository('Mlb\DagBundle\Tests\Doctrine\Entity\NamedDagEdge');
+        $count = $edgeRepo->findAll();
+        $this->assertCount(26, $count);
 
-        $count = $query->getResult();
-        $this->assertCount(30, $count);
-        
-        // Test edges from node 0 to node 1
-        $edges01 = $edgeRepo->findEdges($node0, $node1);
-        $this->assertCount(1, $edges01);
-        $this->assertEquals($edges01[0]->getHops(), 0);
+        // Test direct edges between nodes
+        $directEdges = [
+          $edgeRepo->findEdges($nodes[0], $nodes[2]),
+          $edgeRepo->findEdges($nodes[2], $nodes[4]),
+          $edgeRepo->findEdges($nodes[2], $nodes[5]),
+          $edgeRepo->findEdges($nodes[4], $nodes[7]),
+          $edgeRepo->findEdges($nodes[5], $nodes[8]),
+          $edgeRepo->findEdges($nodes[5], $nodes[9]),
+          $edgeRepo->findEdges($nodes[1], $nodes[3]),
+          $edgeRepo->findEdges($nodes[3], $nodes[5]),
+          $edgeRepo->findEdges($nodes[3], $nodes[6]),
+          $edgeRepo->findEdges($nodes[6], $nodes[9]),
+        ];
 
-        // Test edge getters
-        $edges01[0]->getIncomingEdge();
-        $edges01[0]->getDirectEdge();
-        $edges01[0]->getOutgoingEdge();
+        foreach ($directEdges as $i => $edges) {
+            // Test edge getters
+            if ($i === 0) {
+                $edges[0]->getIncomingEdge();
+                $edges[0]->getDirectEdge();
+                $edges[0]->getOutgoingEdge();
+            }
 
-        // Test edges from node 0 to node 2
-        $edges02 = $edgeRepo->findEdges($node0, $node2);
-        $this->assertCount(2, $edges02);
-        $this->assertEquals($edges02[0]->getHops(), 0);
-        $this->assertEquals($edges02[1]->getHops(), 1);
+            $this->assertCount(1, $edges);
+            $this->assertEquals($edges[0]->getHops(), 0);
+        }
 
-        // Test edges from node 0 to node 3
-        $edges03 = $edgeRepo->findEdges($node0, $node3);
-        $this->assertCount(3, $edges03);
-        $this->assertEquals($edges03[0]->getHops(), 0);
-        $this->assertEquals($edges03[1]->getHops(), 1);
-        $this->assertEquals($edges03[2]->getHops(), 2);
+        // TODO: Test indirect edges between nodes over multiple hops
+        $indirectEdges = [
+          1 => [
 
-        // Test edges from node 0 to node 4
-        $edges04 = $edgeRepo->findEdges($node0, $node4);
-        $this->assertCount(3, $edges04);
-        $this->assertEquals($edges04[0]->getHops(), 1);
-        $this->assertEquals($edges04[1]->getHops(), 2);
-        $this->assertEquals($edges04[2]->getHops(), 3);
+          ],
+          2 => [
 
-        // Test edges from node 1 to node 2
-        $edges12 = $edgeRepo->findEdges($node1, $node2);
-        $this->assertCount(1, $edges12);
-        $this->assertEquals($edges12[0]->getHops(), 0);
+          ],
+        ];
 
-        // Count edges from node 1 to node 3
-        $edges13 = $edgeRepo->findEdges($node1, $node3);
-        $this->assertCount(1, $edges13);
-        $this->assertEquals($edges13[0]->getHops(), 1);
+        foreach ($indirectEdges as $hops => $results) {
+            $count = $hops + 1;
 
-        // Test edges from node 1 to node 4
-        $edges14 = $edgeRepo->findEdges($node1, $node4);
-        $this->assertCount(1, $edges14);
-        $this->assertEquals($edges14[0]->getHops(), 2);
+            foreach ($results as $i => $edges) {
+                $this->assertCount($count, $edges);
 
-        // Test edges from node 2 to node 3
-        $edges23 = $edgeRepo->findEdges($node2, $node3);
-        $this->assertCount(1, $edges23);
-        $this->assertEquals($edges23[0]->getHops(), 0);
-
-        // Test edges from node 2 to node 4
-        $edges24 = $edgeRepo->findEdges($node2, $node4);
-        $this->assertCount(1, $edges24);
-        $this->assertEquals($edges24[0]->getHops(), 1);
-
-        // Test edges from node 3 to node 4
-        $edges34 = $edgeRepo->findEdges($node3, $node4);
-        $this->assertCount(1, $edges34);
-        $this->assertEquals($edges34[0]->getHops(), 0);
-
-        // Test edges from node 5 to node 6
-        $edges56 = $edgeRepo->findEdges($node5, $node6);
-        $this->assertCount(1, $edges56);
-        $this->assertEquals($edges56[0]->getHops(), 0);
-
-        // Test edges from node 5 to node 7
-        $edges57 = $edgeRepo->findEdges($node5, $node7);
-        $this->assertCount(2, $edges57);
-        $this->assertEquals($edges57[0]->getHops(), 0);
-        $this->assertEquals($edges57[1]->getHops(), 1);
-
-        // Test edges from node 5 to node 8
-        $edges58 = $edgeRepo->findEdges($node5, $node8);
-        $this->assertCount(3, $edges58);
-        $this->assertEquals($edges58[0]->getHops(), 0);
-        $this->assertEquals($edges58[1]->getHops(), 1);
-        $this->assertEquals($edges58[2]->getHops(), 2);
-
-        // Test edges from node 5 to node 9
-        $edges59 = $edgeRepo->findEdges($node5, $node9);
-        $this->assertCount(3, $edges59);
-        $this->assertEquals($edges59[0]->getHops(), 1);
-        $this->assertEquals($edges59[1]->getHops(), 2);
-        $this->assertEquals($edges59[2]->getHops(), 3);
-
-        // Test edges from node 6 to node 7
-        $edges67 = $edgeRepo->findEdges($node6, $node7);
-        $this->assertCount(1, $edges67);
-        $this->assertEquals($edges67[0]->getHops(), 0);
-
-        // Count edges from node 6 to node 8
-        $edges68 = $edgeRepo->findEdges($node6, $node8);
-        $this->assertCount(1, $edges68);
-        $this->assertEquals($edges68[0]->getHops(), 1);
-
-        // Test edges from node 6 to node 9
-        $edges69 = $edgeRepo->findEdges($node6, $node9);
-        $this->assertCount(1, $edges69);
-        $this->assertEquals($edges69[0]->getHops(), 2);
-
-        // Test edges from node 7 to node 8
-        $edges78 = $edgeRepo->findEdges($node7, $node8);
-        $this->assertCount(1, $edges78);
-        $this->assertEquals($edges78[0]->getHops(), 0);
-
-        // Test edges from node 7 to node 9
-        $edges79 = $edgeRepo->findEdges($node7, $node9);
-        $this->assertCount(1, $edges79);
-        $this->assertEquals($edges79[0]->getHops(), 1);
-
-        // Test edges from node 8 to node 9
-        $edges89 = $edgeRepo->findEdges($node8, $node9);
-        $this->assertCount(1, $edges89);
-        $this->assertEquals($edges89[0]->getHops(), 0);
+                for ($j = 0; $j < $count; $j++) {
+                    $this->assertEquals($edges[$j]->getHops(), $j);
+                }
+            }
+        }
     }
 
     /*
@@ -205,32 +114,32 @@ class DagConnectFunctionalTest extends IntegrationTestCase
         $this->em = static::getEntityManager();
 
         $nodeRepo = $this->em->getRepository('Mlb\DagBundle\Tests\Doctrine\Entity\NamedDagNode');
-        $node1 = $nodeRepo->findOneByName('Node 1');
-        $node4 = $nodeRepo->findOneByName('Node 4');
-        $node5 = $nodeRepo->findOneByName('Node 5');
-        
+        $node2 = $nodeRepo->findOneByName('Node 2');
+        $node6 = $nodeRepo->findOneByName('Node 6');
+        $node7 = $nodeRepo->findOneByName('Node 7');
+
         $edgeRepo = $this->em->getRepository('Mlb\DagBundle\Tests\Doctrine\Entity\NamedDagEdge');
-        $edgeRepo->createEdge($node4, $node5);
+        $edgeRepo->createEdge($node6, $node7);
 
         // Double creation to complete test coverage
-        $edgeRepo->createEdge($node4, $node5);
+        $edgeRepo->createEdge($node6, $node7);
         $direct = $edgeRepo->findAllDirectEdges();
 
-        $this->assertCount(13, $direct);
+        $this->assertCount(11, $direct);
 
         try {
-            $edgeRepo->createEdge($node5, $node5);;
+            $edgeRepo->createEdge($node2, $node2);
         } catch(CircularRelationException $e) {
         }
 
         try {
-            $edgeRepo->createEdge($node4, $node1);
+            $edgeRepo->createEdge($node7, $node2);
         } catch(CircularRelationException $e) {
         }
 
         try {
-            $deleteEdge =  $edgeRepo->findDirectEdge($node4, $node5);
-            $edgeRepo->deleteEdgeByEnds($node4, $node5);
+            $deleteEdge =  $edgeRepo->findDirectEdge($node6, $node7);
+            $edgeRepo->deleteEdgeByEnds($node6, $node7);
 
             // Already deleted to complete test coverage
             $edgeRepo->deleteEdge($deleteEdge);
@@ -238,6 +147,6 @@ class DagConnectFunctionalTest extends IntegrationTestCase
         }
 
         $direct = $edgeRepo->findAllDirectEdges();
-        $this->assertCount(12, $direct);
+        $this->assertCount(10, $direct);
     }
 }

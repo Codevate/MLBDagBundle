@@ -11,7 +11,7 @@ class LoadDagNodes implements FixtureInterface
     public function load(ObjectManager $manager)
     {
         for ($i = 0; $i < 10; $i++) {
-            $temp = new NamedDagNode('Node '.$i);
+            $temp = new NamedDagNode('Node ' . $i);
             $manager->persist($temp);
         }
 
