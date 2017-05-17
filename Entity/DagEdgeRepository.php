@@ -131,7 +131,7 @@ abstract class DagEdgeRepository extends EntityRepository
                 ->setOutgoingEdge($b)
                 ->setStartNode($a->getStartNode())
                 ->setEndNode($b->getEndNode())
-                ->setHops($step['ahops']+$step['bhops']+1);
+                ->setHops($step['ahops'] + $step['bhops'] + 2);
 
             $em->persist($outgoing);
         }
