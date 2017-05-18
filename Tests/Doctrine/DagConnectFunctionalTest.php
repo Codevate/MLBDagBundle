@@ -55,30 +55,41 @@ class DagConnectFunctionalTest extends IntegrationTestCase
         $count = $edgeRepo->findAll();
         $this->assertCount(26, $count);
 
-        // Test direct edges between nodes
         $directEdges = [
-          $edgeRepo->findEdges($nodes[0], $nodes[2]),
-          $edgeRepo->findEdges($nodes[2], $nodes[4]),
-          $edgeRepo->findEdges($nodes[2], $nodes[5]),
-          $edgeRepo->findEdges($nodes[4], $nodes[7]),
-          $edgeRepo->findEdges($nodes[5], $nodes[8]),
-          $edgeRepo->findEdges($nodes[5], $nodes[9]),
-          $edgeRepo->findEdges($nodes[1], $nodes[3]),
-          $edgeRepo->findEdges($nodes[3], $nodes[5]),
-          $edgeRepo->findEdges($nodes[3], $nodes[6]),
-          $edgeRepo->findEdges($nodes[6], $nodes[9]),
+          // Test direct edges between nodes
+          array('nodes' => array('start' => $nodes[0], 'end' => $nodes[2]), 'hops' => 0),
+          array('nodes' => array('start' => $nodes[2], 'end' => $nodes[4]), 'hops' => 0),
+          array('nodes' => array('start' => $nodes[2], 'end' => $nodes[5]), 'hops' => 0),
+          array('nodes' => array('start' => $nodes[4], 'end' => $nodes[7]), 'hops' => 0),
+          array('nodes' => array('start' => $nodes[5], 'end' => $nodes[8]), 'hops' => 0),
+          array('nodes' => array('start' => $nodes[5], 'end' => $nodes[9]), 'hops' => 0),
+          array('nodes' => array('start' => $nodes[1], 'end' => $nodes[3]), 'hops' => 0),
+          array('nodes' => array('start' => $nodes[3], 'end' => $nodes[5]), 'hops' => 0),
+          array('nodes' => array('start' => $nodes[3], 'end' => $nodes[6]), 'hops' => 0),
+          array('nodes' => array('start' => $nodes[6], 'end' => $nodes[9]), 'hops' => 0),
+
+          // Test indirect edges between nodes
+          array('nodes' => array('start' => $nodes[0], 'end' => $nodes[4]), 'hops' => 1),
+          array('nodes' => array('start' => $nodes[0], 'end' => $nodes[5]), 'hops' => 1),
+          array('nodes' => array('start' => $nodes[0], 'end' => $nodes[7]), 'hops' => 2),
+          array('nodes' => array('start' => $nodes[0], 'end' => $nodes[8]), 'hops' => 2),
+          array('nodes' => array('start' => $nodes[0], 'end' => $nodes[9]), 'hops' => 2),
+          array('nodes' => array('start' => $nodes[1], 'end' => $nodes[5]), 'hops' => 1),
+          array('nodes' => array('start' => $nodes[1], 'end' => $nodes[8]), 'hops' => 2),
+          array('nodes' => array('start' => $nodes[1], 'end' => $nodes[6]), 'hops' => 1),
+          array('nodes' => array('start' => $nodes[1], 'end' => $nodes[9]), 'hops' => 2),
+          array('nodes' => array('start' => $nodes[2], 'end' => $nodes[7]), 'hops' => 1),
+          array('nodes' => array('start' => $nodes[2], 'end' => $nodes[8]), 'hops' => 1),
+          array('nodes' => array('start' => $nodes[2], 'end' => $nodes[9]), 'hops' => 1),
+          array('nodes' => array('start' => $nodes[3], 'end' => $nodes[8]), 'hops' => 1),
+          array('nodes' => array('start' => $nodes[3], 'end' => $nodes[9]), 'hops' => 1)
         ];
 
-        foreach ($directEdges as $i => $edges) {
-            // Test edge getters
-            if ($i === 0) {
-                $edges[0]->getIncomingEdge();
-                $edges[0]->getDirectEdge();
-                $edges[0]->getOutgoingEdge();
-            }
+        foreach ($directEdges as $i => $test) {
+            $edges = $edgeRepo->findEdges($test['nodes']['start'], $test['nodes']['end']);
 
-            $this->assertCount(1, $edges);
-            $this->assertEquals($edges[0]->getHops(), 0);
+            $this->assertGreaterThanOrEqual(1, count($edges), sprintf('No edges between %s and %s', $test['nodes']['start']->getName(), $test['nodes']['end']->getName()));
+            $this->assertEquals($test['hops'], $edges[0]->getHops(), sprintf('Wrong number of hops between %s and %s', $test['nodes']['start']->getName(), $test['nodes']['end']->getName()));
         }
 
         // TODO: Test indirect edges between nodes over multiple hops
