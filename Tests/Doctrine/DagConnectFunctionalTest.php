@@ -91,28 +91,6 @@ class DagConnectFunctionalTest extends IntegrationTestCase
             $this->assertGreaterThanOrEqual(1, count($edges), sprintf('No edges between %s and %s', $test['nodes']['start']->getName(), $test['nodes']['end']->getName()));
             $this->assertEquals($test['hops'], $edges[0]->getHops(), sprintf('Wrong number of hops between %s and %s', $test['nodes']['start']->getName(), $test['nodes']['end']->getName()));
         }
-
-        // TODO: Test indirect edges between nodes over multiple hops
-        $indirectEdges = [
-          1 => [
-
-          ],
-          2 => [
-
-          ],
-        ];
-
-        foreach ($indirectEdges as $hops => $results) {
-            $count = $hops + 1;
-
-            foreach ($results as $i => $edges) {
-                $this->assertCount($count, $edges);
-
-                for ($j = 0; $j < $count; $j++) {
-                    $this->assertEquals($edges[$j]->getHops(), $j);
-                }
-            }
-        }
     }
 
     /*
